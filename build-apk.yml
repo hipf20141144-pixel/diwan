@@ -1,0 +1,80 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare web folder
+        run: |
+          mkdir -p www assets
+          cp index.html www/index.html
+          cp icon.png assets/icon.png || true
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Copy fonts and libraries into www
+        run: node prepare-assets.mjs
+
+      - name: Add a colour layer for diacritics inside the fonts
+        continue-on-error: true
+        run: |
+          pip install --quiet fonttools brotli
+          python colorize_marks.py www/fonts
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Generate app icons
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#1f3a34' || echo "icon generation skipped"
+
+      - name: Sync web files
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/diwan.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: diwan-apk
+          path: out/diwan.apk
+
+      - name: Publish release (download link)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.${{ github.run_number }}
+          name: Diwan v1.${{ github.run_number }}
+          body: "Download diwan.apk and install it on an Android phone."
+          files: out/diwan.apk
+          make_latest: true

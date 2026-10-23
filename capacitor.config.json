@@ -1,0 +1,11 @@
+{
+  "appId": "com.diwan.poetry",
+  "appName": "ديوان",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

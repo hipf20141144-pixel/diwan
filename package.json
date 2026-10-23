@@ -1,0 +1,37 @@
+{
+  "name": "diwan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ديوان — تطبيق لتنسيق وطباعة الشعر العربي",
+  "type": "module",
+  "scripts": {
+    "prepare-assets": "node prepare-assets.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/share": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@fontsource/amiri": "^5.0.0",
+    "@fontsource/aref-ruqaa": "^5.0.0",
+    "@fontsource/cairo": "^5.0.0",
+    "@fontsource/el-messiri": "^5.0.0",
+    "@fontsource/harmattan": "^5.0.0",
+    "@fontsource/katibeh": "^5.0.0",
+    "@fontsource/lalezar": "^5.0.0",
+    "@fontsource/lateef": "^5.0.0",
+    "@fontsource/markazi-text": "^5.0.0",
+    "@fontsource/mirza": "^5.0.0",
+    "@fontsource/noto-kufi-arabic": "^5.0.0",
+    "@fontsource/noto-naskh-arabic": "^5.0.0",
+    "@fontsource/rakkas": "^5.0.0",
+    "@fontsource/reem-kufi": "^5.0.0",
+    "@fontsource/scheherazade-new": "^5.0.0",
+    "html-to-image": "1.11.11",
+    "jspdf": "2.5.2"
+  }
+}

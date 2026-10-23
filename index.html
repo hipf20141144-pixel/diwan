@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a34">
+<title>ديوان</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<!-- خطوط محلية (تُولَّد وقت البناء) ثم خطوط Google كاحتياط عند وجود اتصال -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Lateef:wght@400;700&family=Markazi+Text:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Reem+Kufi:wght@400;700&family=Noto+Kufi+Arabic:wght@400;700&family=Cairo:wght@400;700&family=El+Messiri:wght@400;700&family=Mirza:wght@400;700&family=Harmattan:wght@400;700&family=Katibeh&family=Rakkas&family=Lalezar&display=swap">
+<style>
+:root{
+  --bg:#f1ede3; --panel:#fffdf8; --line:#e2dccb; --text:#26302c; --muted:#76807b;
+  --brand:#1f3a34; --brand2:#2f6b57; --gold:#b08d4a;
+  --bar-h:72px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:"Cairo Local","Cairo","Noto Naskh Arabic",system-ui,sans-serif;
+  font-size:15px;line-height:1.6;
+  padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom));
+}
+button,input,select,textarea{font:inherit;color:inherit}
+
+/* ---------- الترويسة ---------- */
+header.app{
+  position:sticky;top:0;z-index:20;background:var(--brand);color:#f6efdc;
+  padding:calc(10px + env(safe-area-inset-top)) 16px 0;
+}
+header.app h1{margin:0;font-size:21px;font-weight:700;display:flex;align-items:baseline;gap:10px}
+header.app h1 small{font-size:12px;font-weight:400;opacity:.7}
+.tabs{display:flex;gap:4px;margin-top:8px}
+.tabs button{
+  flex:1;border:0;background:transparent;color:#cfd8d2;padding:10px 0 9px;font-weight:700;
+  border-bottom:3px solid transparent;cursor:pointer
+}
+.tabs button.on{color:#fff;border-bottom-color:var(--gold)}
+
+/* ---------- التخطيط ---------- */
+.layout{max-width:1080px;margin:0 auto;padding:14px 14px 20px;display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+.layout>*{min-width:0}
+html,body{overflow-x:hidden}
+body[data-tab="edit"] .view{display:none}
+body[data-tab="view"] .edit{display:none}
+@media (min-width:900px){
+  .tabs{display:none}
+  .layout{grid-template-columns:minmax(0,1fr) 460px;align-items:start}
+  html,body{overflow-x:visible}
+  body[data-tab] .view,body[data-tab] .edit{display:block}
+  .view{position:sticky;top:70px}
+}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+.edit fieldset{border:0;margin:0 0 18px;padding:0}
+.edit fieldset:last-child{margin-bottom:0}
+.edit legend{font-weight:700;color:var(--brand2);font-size:14px;padding:0;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;width:100%}
+.edit legend::after{content:"";flex:1;height:1px;background:var(--line)}
+label.f{display:block;margin-bottom:10px}
+label.f>span{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+input[type=text],input[type=date],textarea,select{
+  width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;outline:none
+}
+input:focus,textarea:focus,select:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(47,107,87,.15)}
+textarea{min-height:190px;resize:vertical;line-height:1.9;font-family:"Amiri Local","Amiri","Noto Naskh Arabic",serif;font-size:18px}
+.hint{margin:6px 2px 0;font-size:12.5px;color:var(--muted)}
+.row{display:flex;gap:10px}
+.row>*{flex:1;min-width:0}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0;font-size:14px}
+.sw input[type=checkbox]{width:20px;height:20px;accent-color:var(--brand2)}
+input[type=range]{width:100%;accent-color:var(--brand2)}
+input[type=color]{width:54px;height:36px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:2px}
+.rng{display:grid;grid-template-columns:86px 1fr 34px;align-items:center;gap:8px;margin:6px 0;font-size:13.5px}
+.rng b{font-weight:600;color:var(--muted);text-align:center}
+
+/* رقاقات الاختيار */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 8px;scrollbar-width:thin}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
+.chip{
+  flex:0 0 auto;border:1.5px solid var(--line);background:#fff;border-radius:12px;
+  padding:7px 14px;cursor:pointer;text-align:center;min-width:76px
+}
+.chip.on{border-color:var(--brand2);background:#eaf3ee;box-shadow:0 0 0 2px rgba(47,107,87,.12)}
+.chip .s{display:block;font-size:20px;line-height:1.7;white-space:nowrap}
+.chip .n{display:block;font-size:11.5px;color:var(--muted)}
+.chip.mode{min-width:0;flex:1 1 44%;text-align:right;padding:10px 12px}
+.chip.mode b{display:block;font-size:15px}
+.chip.mode span{display:block;font-size:12px;color:var(--muted)}
+.chip.theme{min-width:0;display:flex;align-items:center;gap:8px;padding:8px 12px}
+.chip.theme i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,.2);display:block}
+
+/* ---------- المعاينة ---------- */
+.view{padding:12px}
+.view .cap{font-size:12.5px;color:var(--muted);margin:0 2px 8px;text-align:center}
+.stage{display:flex;justify-content:center}
+.sheet{width:100%;display:flex;justify-content:center;filter:drop-shadow(0 8px 20px rgba(30,40,35,.22))}
+
+#card{
+  --paper:#fbf5e6;--ink:#2b2118;--tk:#b3261e;--accent:#8a6d3b;
+  --fs:22px;--ts:32px;--lh:2.1;--gap:.3em;--pf:serif;--tf:serif;--fa:right;
+  width:min(100%,420px);padding:34px 26px 24px;
+  background:var(--paper);color:var(--ink);border-radius:4px;
+  box-shadow:inset 0 0 0 7px var(--paper),inset 0 0 0 8.5px var(--accent);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  text-rendering:optimizeLegibility;font-kerning:normal;
+}
+#cTitle{
+  font-family:var(--tf);font-size:var(--ts);font-weight:700;line-height:1.7;text-align:center;margin:0;
+  padding:2px 6px 0;overflow-wrap:anywhere
+}
+.orn{display:flex;align-items:center;gap:10px;margin:8px 8px 14px;color:var(--accent)}
+.orn i{flex:1;height:1.5px;background:linear-gradient(to left,currentColor,transparent)}
+.orn i:last-child{background:linear-gradient(to right,currentColor,transparent)}
+.orn b{width:9px;height:9px;background:currentColor;transform:rotate(45deg);display:block}
+.orn.bottom{margin:14px 8px 10px}
+#poem{font-family:var(--pf);font-size:var(--fs);line-height:var(--lh);overflow-wrap:anywhere}
+.stanza+.stanza{margin-top:calc(var(--gap)*4)}
+.verse{margin:var(--gap) 0}
+#card.m-vertical{padding-inline:20px}
+.v-col{display:grid;grid-template-columns:1fr 1fr;column-gap:.9em}
+.v-col .hemi{text-align:center;text-wrap:balance}
+.v-st .hemi,.v-ct .hemi{text-wrap:pretty}
+.v-col .solo{grid-column:1/-1;text-align:center}
+.v-st .a{width:90%;margin-inline-end:auto;text-align:start}
+.v-st .b{width:90%;margin-inline-start:auto;text-align:end}
+.v-ct .hemi{text-align:center}
+.v-fr{text-align:var(--fa)}
+.tk{color:var(--tk)}
+/* لون التشكيل يُطبَّق عبر طبقة COLR داخل الخط (انظر scripts/colorize_marks.py) */
+#poem,.foot{font-palette:--tkPoem}
+#cTitle{font-palette:--tkTitle}
+.foot{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  font-family:var(--pf);font-size:calc(var(--fs)*.78);line-height:1.8;color:var(--accent)}
+.foot .poet{font-weight:700;color:var(--ink)}
+.foot:empty,.foot.none{display:none}
+.empty-note{text-align:center;color:var(--accent);opacity:.7;font-family:var(--pf);padding:30px 0}
+
+/* ---------- شريط الأزرار ---------- */
+footer.actions{
+  position:fixed;inset-inline:0;bottom:0;z-index:30;background:rgba(255,253,248,.97);
+  border-top:1px solid var(--line);display:flex;gap:8px;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));backdrop-filter:blur(6px)
+}
+footer.actions button{
+  flex:1;border:0;border-radius:12px;padding:12px 6px;font-weight:700;cursor:pointer;
+  background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px
+}
+footer.actions button.alt{background:#e8efe9;color:var(--brand)}
+footer.actions button:disabled{opacity:.55}
+footer.actions svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tiny{display:flex;gap:8px;margin-top:10px}
+.tiny button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;cursor:pointer;color:var(--muted)}
+
+#toast{
+  position:fixed;left:50%;bottom:calc(var(--bar-h) + 16px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:#26302c;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;max-width:90vw;
+  opacity:0;pointer-events:none;transition:.25s;z-index:50;text-align:center
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- الطباعة ---------- */
+@media print{
+  @page{margin:10mm}
+  html,body{background:#fff!important;padding:0!important}
+  header.app,.edit,footer.actions,#toast,.view .cap{display:none!important}
+  .layout{display:block!important;padding:0!important;max-width:none}
+  .view{display:block!important;position:static!important;border:0!important;padding:0!important;background:none!important}
+  .sheet{filter:none!important}
+  #card{width:100%;max-width:520px;zoom:1.45;break-inside:auto}
+}
+</style>
+<style id="palStyle"></style>
+</head>
+<body data-tab="edit">
+
+<header class="app">
+  <h1>ديوان <small>منسّق الشعر العربي</small></h1>
+  <nav class="tabs" aria-label="التبويبات">
+    <button type="button" data-tab="edit" class="on">تحرير</button>
+    <button type="button" data-tab="view">معاينة</button>
+  </nav>
+</header>
+
+<main class="layout">
+  <!-- ========= التحرير ========= -->
+  <section class="panel edit">
+    <fieldset>
+      <legend>النص</legend>
+      <label class="f"><span>عنوان القصيدة</span>
+        <input type="text" id="title" data-k="title" placeholder="مثال: الخيل والليل" autocomplete="off"></label>
+      <label class="f"><span>نص القصيدة</span>
+        <textarea id="text" data-k="text" placeholder="اكتب أو الصق القصيدة هنا…" spellcheck="false"></textarea></label>
+      <p class="hint">لكل بيت: اكتبه في سطر واحد وافصل بين الشطرين بعلامة <b>*</b>، أو اكتب كل شطر في سطر مستقل. اترك سطراً فارغاً بين المقاطع.</p>
+      <div class="tiny">
+        <button type="button" id="bSample">نموذج</button>
+        <button type="button" id="bClear">مسح النص</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>شكل القصيدة</legend>
+      <div class="chips wrap" id="modeChips"></div>
+      <div id="alignRow" class="sw" hidden>
+        <span>محاذاة الأسطر</span>
+        <select id="align" data-k="align" style="width:auto">
+          <option value="right">يمين</option>
+          <option value="center">وسط</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>الخطوط</legend>
+      <label class="f"><span>خط العنوان</span></label>
+      <div class="chips" id="titleFonts"></div>
+      <label class="f" style="margin-top:6px"><span>خط القصيدة</span></label>
+      <div class="chips" id="poemFonts"></div>
+      <div class="rng"><b>حجم النص</b><input type="range" id="fs" data-k="fs" min="14" max="34" step="1"><b id="fsV"></b></div>
+      <div class="rng"><b>حجم العنوان</b><input type="range" id="ts" data-k="ts" min="20" max="56" step="1"><b id="tsV"></b></div>
+      <div class="rng"><b>تباعد الأسطر</b><input type="range" id="lh" data-k="lh" min="1.6" max="3" step="0.1"><b id="lhV"></b></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>الألوان</legend>
+      <div class="chips wrap" id="themeChips"></div>
+      <div class="row">
+        <label class="f"><span>لون الحروف</span><input type="color" id="ink" data-k="ink"></label>
+        <label class="f"><span>لون التشكيل</span><input type="color" id="tk" data-k="tk"></label>
+      </div>
+      <label class="sw"><span>إظهار التشكيل (الحركات)</span><input type="checkbox" id="showTk" data-k="showTk"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>أسفل الصفحة</legend>
+      <label class="f"><span>اسم الشاعر</span>
+        <input type="text" id="poet" data-k="poet" placeholder="مثال: أبو الطيب المتنبي" autocomplete="off"></label>
+      <div class="row">
+        <label class="f"><span>نوع التاريخ</span>
+          <select id="dateKind" data-k="dateKind">
+            <option value="hijri">هجري</option>
+            <option value="greg">ميلادي</option>
+            <option value="text">نص مكتوب</option>
+            <option value="none">بدون تاريخ</option>
+          </select></label>
+        <label class="f" id="dateWrap"><span>التاريخ</span><input type="date" id="date" data-k="date"></label>
+        <label class="f" id="dateTextWrap" hidden><span>التاريخ (نص)</span><input type="text" id="dateText" data-k="dateText" placeholder="مثال: رجب ١٤٤٨ هـ"></label>
+      </div>
+      <label class="sw" id="hindiWrap"><span>أرقام هندية (٠١٢٣)</span><input type="checkbox" id="hindi" data-k="hindi"></label>
+    </fieldset>
+  </section>
+
+  <!-- ========= المعاينة ========= -->
+  <section class="panel view">
+    <p class="cap">هكذا سيخرج النص على الجوال</p>
+    <div class="stage"><div class="sheet">
+      <article id="card" lang="ar">
+        <h2 id="cTitle"></h2>
+        <div class="orn" id="ornTop"><i></i><b></b><i></i></div>
+        <div id="poem"></div>
+        <div class="orn bottom" id="ornBot"><i></i><b></b><i></i></div>
+        <div class="foot" id="cFoot"><span class="poet" id="cPoet"></span><span class="date" id="cDate"></span></div>
+      </article>
+    </div></div>
+  </section>
+</main>
+
+<footer class="actions">
+  <button type="button" id="bPrint"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z"/></svg>طباعة</button>
+  <button type="button" id="bPng" class="alt"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>حفظ صورة</button>
+  <button type="button" id="bPdf" class="alt"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>حفظ PDF</button>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+
+/* ---------------- ثوابت ---------------- */
+const FONTS = [
+  ['Amiri','الأميري'],['Scheherazade New','شهرزاد'],['Noto Naskh Arabic','نوتو نسخ'],['Lateef','لطيف'],
+  ['Markazi Text','مركزي'],['Aref Ruqaa','عارف رقعة'],['Reem Kufi','ريم كوفي'],['Noto Kufi Arabic','نوتو كوفي'],
+  ['Cairo','القاهرة'],['El Messiri','المسيري'],['Mirza','ميرزا'],['Harmattan','هرمتان'],
+  ['Katibeh','كاتبة'],['Rakkas','رقّاص'],['Lalezar','لاله زار']
+];
+const stack = id => '"' + id + ' Local","' + id + '",serif';
+
+const THEMES = [
+  {id:'paper', n:'ورقي',  paper:'#fbf5e6', ink:'#2b2118', tk:'#b3261e', accent:'#8a6d3b'},
+  {id:'white', n:'أبيض',  paper:'#ffffff', ink:'#16181d', tk:'#1a56db', accent:'#6b7280'},
+  {id:'green', n:'أخضر',  paper:'#eaf3ec', ink:'#17352b', tk:'#b4341f', accent:'#2f6b57'},
+  {id:'night', n:'ليلي',  paper:'#111a2b', ink:'#f1ead8', tk:'#f2b84b', accent:'#c9a85c'}
+];
+const MODES = [
+  ['vertical','عمودي','شطران متقابلان في كل بيت'],
+  ['stagger','متداخل','الشطر الثاني تحت الأول وإلى اليسار'],
+  ['center','وسطي','الشطران متتاليان في المنتصف'],
+  ['free','حر / تفعيلة','سطر لكل سطر كما كتبته']
+];
+
+const SAMPLE = [
+  'الخَيْلُ وَاللَّيْلُ وَالبَيْداءُ تَعْرِفُنِي * وَالسَّيْفُ وَالرُّمْحُ وَالقِرْطاسُ وَالقَلَمُ',
+  'صَحِبْتُ فِي الفَلَواتِ الوَحْشَ مُنْفَرِداً * حَتَّى تَعَجَّبَ مِنِّي القُورُ وَالأَكَمُ',
+  'يا أَعْدَلَ النّاسِ إِلّا فِي مُعامَلَتي * فِيكَ الخِصامُ وَأَنْتَ الخَصْمُ وَالحَكَمُ'
+].join('\n');
+
+const pad = n => String(n).padStart(2,'0');
+const todayStr = () => { const d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+
+const DEF = {
+  title:'الخيل والليل', text:SAMPLE, poet:'أبو الطيب المتنبي',
+  mode:'vertical', align:'right',
+  titleFont:'Aref Ruqaa', poemFont:'Amiri', fs:22, ts:32, lh:2.1,
+  theme:'paper', ink:'#2b2118', tk:'#b3261e', showTk:true,
+  dateKind:'hijri', date:todayStr(), dateText:'', hindi:false
+};
+const KEY = 'diwan.state.v1';
+let state = Object.assign({}, DEF);
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) state = Object.assign(state, s); } catch(e){}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} };
+
+/* ---------------- معالجة النص العربي ---------------- */
+// الحركات: فتحتان…سكون، علامات إضافية، ألف خنجرية، علامات قرآنية صغيرة
+const TK_CLASS = '\\u064B-\\u065F\\u0670\\u06D6-\\u06DC\\u06DF-\\u06E8\\u06EA-\\u06ED';
+const TK_SPLIT = new RegExp('([' + TK_CLASS + ']+)');
+const TK_ALL   = new RegExp('[' + TK_CLASS + ']+', 'g');
+
+function arabicFrag(text, showTk){
+  const frag = document.createDocumentFragment();
+  if (!showTk) { frag.appendChild(document.createTextNode(text.replace(TK_ALL, ''))); return frag; }
+  text.split(TK_SPLIT).forEach((part, i) => {
+    if (!part) return;
+    if (i % 2) { const s = document.createElement('span'); s.className = 'tk'; s.textContent = part; frag.appendChild(s); }
+    else frag.appendChild(document.createTextNode(part));
+  });
+  return frag;
+}
+
+const SEP = /\s*(?:\*+|…+|\.{3,}|\||\t+)\s*/;
+function parsePoem(text, mode){
+  const lines = text.replace(/\r/g,'').split('\n');
+  const stanzas = []; let cur = [];
+  lines.forEach(raw => {
+    const l = raw.trim();
+    if (!l) { if (cur.length) { stanzas.push(cur); cur = []; } } else cur.push(l);
+  });
+  if (cur.length) stanzas.push(cur);
+  const split = l => l.split(SEP).map(s => s.trim()).filter(Boolean);
+  const hasSep = stanzas.some(st => st.some(l => split(l).length >= 2));
+  return stanzas.map(st => {
+    if (mode === 'free') return st.map(l => ({a: split(l).join(' '), b: ''}));
+    if (hasSep) return st.map(l => { const p = split(l); return {a: p[0] || '', b: p.slice(1).join(' ')}; });
+    const out = [];
+    for (let i = 0; i < st.length; i += 2) out.push({a: st[i], b: st[i+1] || ''});
+    return out;
+  });
+}
+
+function fmtDate(){
+  const k = state.dateKind;
+  if (k === 'none') return '';
+  if (k === 'text') return (state.dateText || '').trim();
+  const d = state.date ? new Date(state.date + 'T12:00:00') : new Date();
+  const cal = k === 'hijri' ? 'islamic-umalqura' : 'gregory';
+  const nu = state.hindi ? 'arab' : 'latn';
+  try {
+    let s = new Intl.DateTimeFormat('ar-SA-u-ca-' + cal + '-nu-' + nu, {year:'numeric', month:'long', day:'numeric'}).format(d);
+    if (!/(هـ|م)\s*$/.test(s)) s += k === 'hijri' ? ' هـ' : ' م';
+    return s;
+  } catch(e) { return state.date || ''; }
+}
+
+/* ---------------- الرسم ---------------- */
+function el(tag, cls, child){
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (child) e.appendChild(child);
+  return e;
+}
+
+// قواعد لوحة الألوان: تجعل حركات الخط المحلي تأخذ لون التشكيل المختار
+function paletteCss(){
+  const r = (name, font) => '@font-palette-values ' + name + '{font-family:"' + font + ' Local";override-colors:0 ' + state.tk + ';}';
+  return r('--tkPoem', state.poemFont) + r('--tkTitle', state.titleFont);
+}
+
+function renderCard(){
+  $('#palStyle').textContent = paletteCss();
+  const card = $('#card');
+  const th = THEMES.find(t => t.id === state.theme) || THEMES[0];
+  card.style.setProperty('--paper', th.paper);
+  card.style.setProperty('--accent', th.accent);
+  card.style.setProperty('--ink', state.ink);
+  card.style.setProperty('--tk', state.tk);
+  // الشكل العمودي يضع شطرين جنباً إلى جنب فيحتاج خطاً أصغر ليناسب عرض الجوال
+  card.style.setProperty('--fs', (state.mode === 'vertical' ? state.fs * 0.8 : state.fs).toFixed(1) + 'px');
+  card.classList.toggle('m-vertical', state.mode === 'vertical');
+  card.style.setProperty('--ts', state.ts + 'px');
+  card.style.setProperty('--lh', state.lh);
+  card.style.setProperty('--pf', stack(state.poemFont));
+  card.style.setProperty('--tf', stack(state.titleFont));
+  card.style.setProperty('--fa', state.align);
+
+  // العنوان
+  const t = $('#cTitle'); t.textContent = '';
+  const title = (state.title || '').trim();
+  t.appendChild(arabicFrag(title, state.showTk));
+  t.style.display = title ? '' : 'none';
+  $('#ornTop').style.display = title ? '' : 'none';
+
+  // القصيدة
+  const poem = $('#poem'); poem.textContent = '';
+  const stanzas = parsePoem(state.text || '', state.mode);
+  if (!stanzas.length) poem.appendChild(el('div','empty-note', document.createTextNode('…')));
+  stanzas.forEach(st => {
+    const box = el('div','stanza');
+    st.forEach(v => {
+      let row;
+      if (state.mode === 'vertical') {
+        row = el('div','verse v-col');
+        if (v.b) {
+          row.appendChild(el('div','hemi', arabicFrag(v.a, state.showTk)));
+          row.appendChild(el('div','hemi', arabicFrag(v.b, state.showTk)));
+        } else row.appendChild(el('div','hemi solo', arabicFrag(v.a, state.showTk)));
+      } else if (state.mode === 'stagger') {
+        row = el('div','verse v-st');
+        row.appendChild(el('div','hemi a', arabicFrag(v.a, state.showTk)));
+        if (v.b) row.appendChild(el('div','hemi b', arabicFrag(v.b, state.showTk)));
+      } else if (state.mode === 'center') {
+        row = el('div','verse v-ct');
+        row.appendChild(el('div','hemi', arabicFrag(v.a, state.showTk)));
+        if (v.b) row.appendChild(el('div','hemi', arabicFrag(v.b, state.showTk)));
+      } else {
+        row = el('div','verse v-fr', arabicFrag(v.a, state.showTk));
+      }
+      box.appendChild(row);
+    });
+    poem.appendChild(box);
+  });
+
+  // التذييل
+  const poet = (state.poet || '').trim(), date = fmtDate();
+  $('#cPoet').textContent = poet;
+  $('#cDate').textContent = date;
+  const none = !poet && !date;
+  $('#cFoot').classList.toggle('none', none);
+  $('#ornBot').style.display = none ? 'none' : '';
+}
+
+/* ---------------- بناء عناصر الواجهة ---------------- */
+function buildChips(){
+  const mc = $('#modeChips');
+  MODES.forEach(([id, n, d]) => {
+    const b = el('button','chip mode'); b.type = 'button'; b.dataset.id = id;
+    b.innerHTML = '<b>' + n + '</b><span>' + d + '</span>';
+    b.onclick = () => { state.mode = id; sync(); };
+    mc.appendChild(b);
+  });
+  [['#titleFonts','titleFont'],['#poemFonts','poemFont']].forEach(([sel, key]) => {
+    const c = $(sel);
+    FONTS.forEach(([id, n]) => {
+      const b = el('button','chip'); b.type = 'button'; b.dataset.id = id;
+      const s = el('span','s'); s.textContent = 'قَصِيدَة'; s.style.fontFamily = stack(id);
+      const nn = el('span','n'); nn.textContent = n;
+      b.append(s, nn);
+      b.onclick = () => { state[key] = id; sync(); };
+      c.appendChild(b);
+    });
+  });
+  const tc = $('#themeChips');
+  THEMES.forEach(th => {
+    const b = el('button','chip theme'); b.type = 'button'; b.dataset.id = th.id;
+    const i = el('i'); i.style.background = th.paper; i.style.boxShadow = 'inset 0 0 0 4px ' + th.paper + ', inset 0 0 0 11px ' + th.tk;
+    b.append(i, document.createTextNode(th.n));
+    b.onclick = () => { state.theme = th.id; state.ink = th.ink; state.tk = th.tk; sync(); };
+    tc.appendChild(b);
+  });
+}
+
+function markChips(sel, key){
+  document.querySelectorAll(sel + ' .chip').forEach(c => c.classList.toggle('on', c.dataset.id === state[key]));
+}
+
+function syncControls(){
+  document.querySelectorAll('[data-k]').forEach(e => {
+    const k = e.dataset.k;
+    if (e.type === 'checkbox') e.checked = !!state[k];
+    else if (e !== document.activeElement) e.value = state[k];
+  });
+  $('#fsV').textContent = state.fs; $('#tsV').textContent = state.ts; $('#lhV').textContent = (+state.lh).toFixed(1);
+  markChips('#modeChips','mode'); markChips('#titleFonts','titleFont'); markChips('#poemFonts','poemFont'); markChips('#themeChips','theme');
+  $('#alignRow').hidden = state.mode !== 'free';
+  const k = state.dateKind;
+  $('#dateWrap').hidden = !(k === 'hijri' || k === 'greg');
+  $('#dateTextWrap').hidden = k !== 'text';
+  $('#hindiWrap').hidden = !(k === 'hijri' || k === 'greg');
+}
+
+let raf = 0;
+function sync(){ syncControls(); cancelAnimationFrame(raf); raf = requestAnimationFrame(renderCard); save(); }
+
+document.querySelectorAll('[data-k]').forEach(e => {
+  const h = () => {
+    const k = e.dataset.k;
+    state[k] = e.type === 'checkbox' ? e.checked : (e.type === 'range' ? +e.value : e.value);
+    sync();
+  };
+  e.addEventListener('input', h);
+  e.addEventListener('change', h);
+});
+
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  document.body.dataset.tab = b.dataset.tab;
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  window.scrollTo({top:0});
+});
+$('#bSample').onclick = () => { state.text = SAMPLE; state.title = DEF.title; state.poet = DEF.poet; sync(); };
+$('#bClear').onclick  = () => { state.text = ''; sync(); $('#text').focus(); };
+
+/* ---------------- تنبيه قصير ---------------- */
+let tt = 0;
+function toast(msg, ms){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), ms || 2600);
+}
+
+/* ---------------- التصدير ---------------- */
+function loadScript(srcs){
+  return new Promise((res, rej) => {
+    let i = 0;
+    const next = () => {
+      if (i >= srcs.length) return rej(new Error('تعذّر تحميل المكتبة'));
+      const s = document.createElement('script'); s.src = srcs[i++];
+      s.onload = res; s.onerror = () => { s.remove(); next(); };
+      document.head.appendChild(s);
+    };
+    next();
+  });
+}
+async function ensureHTI(){
+  if (!window.htmlToImage) await loadScript(['lib/html-to-image.js','https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js']);
+}
+async function ensurePDF(){
+  if (!window.jspdf) await loadScript(['lib/jspdf.umd.min.js','https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js']);
+}
+
+async function cardPng(scale){
+  await ensureHTI();
+  renderCard();
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const node = $('#card');
+  const opts = {pixelRatio: scale || 3, backgroundColor: getComputedStyle(node).getPropertyValue('--paper').trim() || '#fff'};
+  // نضمّن الخطوط المستعملة + قواعد لون التشكيل داخل الصورة المصدَّرة
+  try { opts.fontEmbedCSS = (await window.htmlToImage.getFontEmbedCSS(node)) + '\n' + paletteCss(); } catch(e){}
+  try { await window.htmlToImage.toPng(node, opts); } catch(e){}   // تمرير أول لضمان تضمين الخطوط
+  return window.htmlToImage.toPng(node, opts);
+}
+
+function fileBase(){ return ((state.title || 'قصيدة').replace(/[\\/:*?"<>|]+/g,'').trim().slice(0,40)) || 'قصيدة'; }
+
+const plugins = {};
+const plug = n => plugins[n] || (plugins[n] = window.Capacitor.registerPlugin(n));
+
+async function deliver(base64, filename, mime){
+  if (isNative) {
+    const r = await plug('Filesystem').writeFile({path: filename, data: base64, directory: 'CACHE'});
+    await plug('Share').share({title: 'ديوان', url: r.uri, dialogTitle: 'حفظ أو مشاركة'});
+  } else {
+    const a = document.createElement('a');
+    a.href = 'data:' + mime + ';base64,' + base64; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+}
+
+async function exportPdfBase64(){
+  await ensurePDF();
+  const img = await cardPng(2.5);
+  const node = $('#card');
+  const ratio = node.offsetHeight / node.offsetWidth;
+  const {jsPDF} = window.jspdf;
+  const pw = 210, ph = 297, m = 12;
+  let w = pw - 2*m, h = w * ratio;
+  let page = [pw, ph];
+  if (h > ph - 2*m) page = [pw, h + 2*m];           // قصيدة طويلة: صفحة واحدة بطول مناسب
+  const pdf = new jsPDF({unit:'mm', format:page, orientation:'portrait'});
+  pdf.addImage(img, 'PNG', (pw - w)/2, m, w, h);
+  return pdf.output('datauristring').split(',')[1];
+}
+
+async function busy(btn, fn){
+  const all = document.querySelectorAll('footer.actions button');
+  all.forEach(b => b.disabled = true);
+  toast('جارٍ التجهيز…', 8000);
+  try { await fn(); toast('تم ✓'); }
+  catch(e){ console.error(e); toast('تعذّر التنفيذ: ' + (e && e.message ? e.message : e), 4500); }
+  finally { all.forEach(b => b.disabled = false); }
+}
+
+$('#bPng').onclick = () => busy(null, async () => {
+  const url = await cardPng(3);
+  await deliver(url.split(',')[1], fileBase() + '.png', 'image/png');
+});
+$('#bPdf').onclick = () => busy(null, async () => {
+  await deliver(await exportPdfBase64(), fileBase() + '.pdf', 'application/pdf');
+});
+$('#bPrint').onclick = () => {
+  if (!isNative && typeof window.print === 'function') { renderCard(); window.print(); return; }
+  // داخل التطبيق: نجهّز PDF ثم تظهر قائمة المشاركة (فيها خيار الطباعة وخيارات الحفظ)
+  busy(null, async () => {
+    await deliver(await exportPdfBase64(), fileBase() + '.pdf', 'application/pdf');
+  });
+};
+
+/* ---------------- تشغيل ---------------- */
+buildChips();
+sync();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderCard);
+
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !isNative) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+})();
+</script>
+</body>
+</html>
